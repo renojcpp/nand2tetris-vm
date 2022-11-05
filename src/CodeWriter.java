@@ -163,69 +163,68 @@ public class CodeWriter {
         writeDecSP();
         writer.write("A=M\n");
         writer.write("D=M\n");
-        writer.write("@R13\n");
-        writer.write("M=D\n");
-        writeDecSP();
-        writer.write("A=M\n");
-        writer.write("D=M\n");
-        writer.write("@R13\n");
-        writer.write(String.format("D=D%sM\n", op));
-        writeRamSP();
-        writer.write("M=D\n");
-        writeIncSP();
+        writer.write("@SP\n");
+        writer.write("A=M-1\n");
+        writer.write(op+"\n");
     }
 
     private void writeLogicalOp(String jmpSym) {
-        final String trueLabel = String.format("LABEL_%s_%d_true", jmpSym, labelNumber);
-        final String endLabel = String.format("LABEL_%s_%d_end", jmpSym, labelNumber);
-
-        writeDecSP();
-        writer.write("A=M\n");
-        writer.write("D=M\n");
-        writer.write("@R13\n"); // arg1
-        writer.write("M=D\n");
+        final String jumpLabel = String.format("LABEL_%s_%d", jmpSym, labelNumber);
 
         writeDecSP();
         writer.write("A=M\n");
         writer.write("D=M\n");
 
-        writer.write("@R13\n"); //arg 2
-        writer.write("D=D-M\n"); // D = arg1 - arg2
-        writer.write(String.format("@%s\n", trueLabel));
-        writer.write(String.format("D;%s\n", jmpSym));
-        writeRamSP();
-        writer.write("M=0\n");
-        writer.write(String.format("@%s\n", endLabel));
-        writer.write("0;JMP\n");
-        writer.write(String.format("(%s)\n", trueLabel));
-        writeRamSP();
+        writer.write("@SP\n");
+        writer.write("A=M-1\n");
+
+        writer.write("D=M-D\n"); // D = arg1 - arg2
         writer.write("M=-1\n");
-        writer.write(String.format("(%s)\n", endLabel));
-        writeIncSP();
+        writer.write(String.format("@%s\n", jumpLabel));
+        writer.write(String.format("D;%s\n", jmpSym));
+
+        writer.write("@SP\n");
+        writer.write("A=M-1\n");
+        writer.write("M=0\n");
+        writer.write(String.format("(%s)\n", jumpLabel));
+
         ++labelNumber;
-
     }
 
-    private void writeUnaryNegate() {
-        writeDecSP();
-        writer.write("A=M\n");
-        writer.write("M=!M\n");
-        writer.write("M=M+1\n");
-        writeIncSP();
+    private void writeUnaryOp(String line) {
+        writer.write("@SP\n");
+        writer.write("A=M-1\n");
+        writer.write(line+"\n");
     }
 
-    private void writeUnaryNot() {
-        writeDecSP();
-        writer.write("A=M\n");
-        writer.write("M=!M\n");
-        writeIncSP();
-    }
+    private void writeOffsetSegmentValue(String segment, String symbol, int offset) {
+        writer.write(String.format("%s\n", symbol));
+        writer.write("D=A\n");
 
-    private void writeOffsetSegment(String symbol, int offset) {
+        if (!segment.equals("pointer")) {
+            writer.write(String.format("@%d\n", offset));
+            writer.write("A=D+A\n");
+            writer.write("D=A\n");
+        }
+    }
+    private void writeOffsetSegmentMemory(String segment, String symbol, int offset) {
         writer.write(String.format("%s\n", symbol));
         writer.write("D=M\n");
         writer.write(String.format("@%d\n", offset));
         writer.write("A=D+A\n");
+        writer.write("D=A\n");
+    }
+
+    private void writeOffsetSegment(String segment, String symbol, int offset) {
+        switch (segment) {
+            case "temp", "pointer" -> {
+                writeOffsetSegmentValue(segment, symbol, offset);
+            }
+            case "local", "argument", "this", "that" -> {
+                writeOffsetSegmentMemory(segment, symbol, offset);
+            }
+            default -> throw new RuntimeException("writeOffsetSegment: " + segment);
+        }
     }
 
     private void writeRamSP() {
@@ -239,18 +238,13 @@ public class CodeWriter {
                 writer.write(String.format("@%d\n", index));
                 writer.write("D=A\n");
 
-                writeRamSP();
+                writer.write("@SP\n");
+                writer.write("AM=M+1\n");
+                writer.write("A=A-1\n");
                 writer.write("M=D\n");
-
-                writeIncSP();
             }
-            case "static", "pointer" -> {
-                final String sym = switch (segment) {
-                    case "static" -> String.format("@%s.%d\n", filename.split(".+?/(?=[^/]+$)")[1], index);
-                    case "pointer" -> String.format("@%s\n", index == 0 ? "THIS" : "THAT");
-                    default -> throw new RuntimeException("writePushSegment: " + segment);
-                };
-
+            case "static" -> {
+                final String sym = String.format("@%s.%d\n", filename.split(".+?/(?=[^/]+$)")[1], index);
                 writer.write(sym);
                 writer.write("D=M\n");
 
@@ -259,46 +253,33 @@ public class CodeWriter {
 
                 writeIncSP();
             }
-            case "local", "argument", "this", "that" -> {
+            case "local", "argument", "this", "that", "pointer", "temp" -> {
                 final String sym = switch (segment) {
                     case "local" -> "@LCL";
                     case "argument" -> "@ARG";
                     case "this" -> "@THIS";
                     case "that" -> "@THAT";
+                    case "pointer" -> index == 0 ? "@THIS" : "@THAT";
+                    case "temp" -> "@5";
                     default -> throw new RuntimeException("writePushSegment: " + segment);
                 };
 
-                writeOffsetSegment(sym, index);
+                writeOffsetSegment(segment, sym, index);
                 writer.write("D=M\n");
-
-                writer.write("@SP\n");
-                writer.write("A=M\n");
-                writer.write("M=D\n");
-
-                writeIncSP();
-            }
-            case "temp" -> {
-                writer.write("@5\n");
-                writer.write("D=A\n");
-                writer.write(String.format("@%d\n", index));
-                writer.write("D=A\n");
 
                 writeRamSP();
                 writer.write("M=D\n");
-                writeIncSP();
 
+                writeIncSP();
             }
         }
+
     }
 
     private void writePopSegment(String segment, int index) {
         switch (segment) {
-            case "static", "pointer" -> {
-                final String sym = switch (segment) {
-                    case "static" -> String.format("@%s.%d\n", filename.split(".+?/(?=[^/]+$)")[1], index);
-                    case "pointer" -> String.format("@%s\n", index == 0 ? "THIS" : "THAT");
-                    default -> throw new RuntimeException("writePopSegment: " + segment);
-                };
+            case "static" -> {
+                final String sym = String.format("@%s.%d\n", filename.split(".+?/(?=[^/]+$)")[1], index);
 
                 writeDecSP();
                 writer.write("A=M\n");
@@ -308,17 +289,18 @@ public class CodeWriter {
                 writer.write("M=D\n");
             }
 
-            case "local", "argument", "this", "that" -> {
+            case "local", "argument", "this", "that", "temp", "pointer" -> {
                 final String sym = switch (segment) {
                     case "local" -> "@LCL";
                     case "argument" -> "@ARG";
                     case "this" -> "@THIS";
                     case "that" -> "@THAT";
+                    case "temp" -> "@5";
+                    case "pointer" -> index == 0 ? "@THIS" : "@THAT";
                     default -> throw new RuntimeException("writePopSegment " + segment);
                 };
 
-                writeOffsetSegment(sym, index);
-                writer.write("D=A\n");
+                writeOffsetSegment(segment, sym, index);
 
                 writer.write("@R13\n");
                 writer.write("M=D\n");
@@ -328,23 +310,6 @@ public class CodeWriter {
                 writer.write("A=M\n");
                 writer.write("D=M\n");
 
-                writer.write("@R13\n");
-                writer.write("A=M\n");
-                writer.write("M=D\n");
-            }
-            case "temp" -> {
-                writer.write("@5\n");
-                writer.write("D=A\n");
-                writer.write(String.format("@%d\n", index));
-                writer.write("D=D+A\n");
-
-                writer.write("@R13\n");
-                writer.write("M=D\n");
-
-                writeDecSP();
-
-                writer.write("A=M\n");
-                writer.write("D=M\n");
                 writer.write("@R13\n");
                 writer.write("A=M\n");
                 writer.write("M=D\n");
@@ -358,29 +323,10 @@ public class CodeWriter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        mainStack = new Stack<>();
-        // starts at 5
-//        Vector<Short> tempSegment = new Vector<>(8);
-//        // starts at 16
-//        Vector<Short> staticSegment = new Vector<>(255 - 16 + 1);
-//        // 3 and 4
-//        Vector<Short> pointerSegment = new Vector<>(2);
-//        Vector<Short> localSegment = new Vector<>();// todo: find out
-//
-//        segmentMap = Map.ofEntries(
-//                Map.entry("temp", tempSegment),
-//                Map.entry("static", staticSegment),
-//                Map.entry("pointer", pointerSegment),
-//                Map.entry("local", localSegment)
-//        );
-//
-
         this.filename = filename;
         this.labelNumber = 0;
 
     }
-
-
 
     public void writeArithmetic(String command) {
 //        final short first = mainStack.pop();
@@ -388,24 +334,24 @@ public class CodeWriter {
         switch (command) {
             case "add" -> {
 //                res = (short) (mainStack.pop() + first);
-                writeBinaryOp("+");
+                writeBinaryOp("M=D+M");
             }
             case "sub" -> {
 //                res = (short) (mainStack.pop() - first);
-                writeBinaryOp("-");
+                writeBinaryOp("M=M-D");
             }
 
             case "neg" -> {
 //                res = (short) -first;
-                writeUnaryNegate();
+                writeUnaryOp("M=-M");
             }
 
             case "and" -> {
-                writeBinaryOp("&");
+                writeBinaryOp("M=D&M");
             }
 
             case "or" -> {
-                writeBinaryOp("|");
+                writeBinaryOp("M=D|M");
             }
 
             case "eq" -> {
@@ -421,7 +367,7 @@ public class CodeWriter {
             }
 
             case "not" -> {
-                writeUnaryNot();
+                writeUnaryOp("M=!M");
             }
         };
 
@@ -429,21 +375,6 @@ public class CodeWriter {
     }
 
     public void writePushPop(CommandType cmd, String segment, int index) {
-//        if (segment.equals("constant")) {
-//            mainStack.push((short) index);
-//        } else {
-//            final Vector<Short> arr = segmentMap.get(segment);
-//            if (cmd == CommandType.C_PUSH) {
-//                mainStack.push(arr.get(index));
-//            } else { // CommandType.C_POP
-//                final short v = mainStack.pop();
-//                if (index > arr.size()) {
-//                    arr.setSize(index);
-//                }
-//                arr.set(index, v);
-//            }
-//        }
-
         if (cmd == CommandType.C_PUSH) {
             writePushSegment(segment, index);
         } else if (cmd == CommandType.C_POP) {

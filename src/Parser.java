@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Arrays;
 
 public class Parser {
     private String[] commands;
@@ -11,9 +12,10 @@ public class Parser {
         try {
             FileReader fr = new FileReader(filename);
             BufferedReader reader = new BufferedReader(fr);
-            commands = reader.lines().map(String::trim).map(s -> s.replaceAll("\\s+", " ")).map(s -> s.split(" ")[0])
+            commands = reader.lines().map(String::trim).map(s -> s.replaceAll("\\s+", " "))
                     .filter(s -> !isComment(s) && !isEmptyLine(s))
                     .toArray(String[]::new);
+
             this.filename = filename;
         } catch (FileNotFoundException e) {
             System.err.println("No such file " + filename);
@@ -56,6 +58,7 @@ public class Parser {
                     "and", "or", "not" -> CommandType.C_ARITHMETIC;
             case "push" -> CommandType.C_PUSH;
             case "pop" -> CommandType.C_POP;
+            default -> throw new RuntimeException("CommandType()" + first);
         };
     }
 

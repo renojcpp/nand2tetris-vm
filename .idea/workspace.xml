@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="500a57a1-c2d7-4e1e-b387-3385423dd2b7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/CodeWriter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/CommandType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Segment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/VMTranslator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CodeWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CodeWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +40,16 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="vm" />
+      <option name="PROGRAM_PARAMETERS" value="$USER_HOME$/school/cs3650/nand2tetris/projects/07/StackArithmetic/SimpleAdd/SimpleAdd.vm $USER_HOME$/school/cs3650/nand2tetris/projects/07/StackArithmetic/StackTest/StackTest.vm $USER_HOME$/school/cs3650/nand2tetris/projects/07/MemoryAccess/BasicTest/BasicTest.vm $USER_HOME$/school/cs3650/nand2tetris/projects/07/MemoryAccess/PointerTest/PointerTest.vm $USER_HOME$/school/cs3650/nand2tetris/projects/07/MemoryAccess/StaticTest/StaticTest.vm" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -65,7 +77,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Parser.java</url>
-          <line>33</line>
+          <line>35</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

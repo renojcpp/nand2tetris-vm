@@ -1,16 +1,36 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 public class VMTranslator {
     public static void translate(String[] args) {
         for (String arg : args) {
-            translate(arg);
+            File f = new File(arg);
+            if (f.isFile()) {
+                final int extIndex = arg.lastIndexOf(".");
+                final String outputName = arg.substring(0, extIndex) + ".asm";
+
+                translate(new CodeWriter(outputName), arg);
+            } else if (f.isDirectory()) {
+                final int extIndex = arg.lastIndexOf("/");
+                final String outputName = extIndex == -1? arg + ".asm" : arg.substring(0, extIndex) + ".asm";
+                CodeWriter writer = new CodeWriter(outputName);
+                try (Stream<Path> stream = Files.list(Paths.get(arg))) {
+                    stream.filter(file -> !Files.isDirectory(file)).map(Path::toString)
+                            .forEach(file -> translate(writer, file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    private static void translate(String arg) {
-        final int extIndex = arg.lastIndexOf(".");
-        final String outputName = arg.substring(0, extIndex) + ".asm";
-        CodeWriter writer = new CodeWriter(outputName);
+    private static void translate(CodeWriter writer, String arg) {
         Parser parser = new Parser(arg);
-
+        writer.setFilename(arg);
         while (parser.hasMoreLines()) {
             String arg1 = "";
             String arg2 = "";
@@ -27,6 +47,24 @@ public class VMTranslator {
                 }
                 case C_POP, C_PUSH -> {
                     writer.writePushPop(cmdType, arg1, Integer.parseInt(arg2));
+                }
+                case C_CALL -> {
+                    writer.writeCall(arg1, Integer.parseInt(arg2));
+                }
+                case C_FUNCTION -> {
+                    writer.writeFunction(arg1, Integer.parseInt(arg2));
+                }
+                case C_GOTO -> {
+                    writer.writeGoto(arg1);
+                }
+                case C_IF -> {
+                    writer.writeIf(arg1);
+                }
+                case C_LABEL -> {
+                    writer.writeLabel(arg1);
+                }
+                case C_RETURN -> {
+                    writer.writeReturn();
                 }
             }
             parser.advance();

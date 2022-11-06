@@ -23,11 +23,13 @@ import java.io.PrintWriter;
  *      R15
  */
 
+
 public class CodeWriter {
     private final PrintWriter writer;
     private String filename;
     private int labelNumber;
     private String functionName;
+
 
     private void writeDecSP() {
         writer.write("@SP\n");
@@ -189,13 +191,21 @@ public class CodeWriter {
         writer.write("@SP\n");
         writer.write("M=D\n");
 
-        writeFunction("OS", 0);
         writeCall("Sys.init", 0);
     }
 
     // translation of a new file
     public void setFilename(String filename) {
-        this.filename = filename;
+        String f = filename;
+        int n = filename.lastIndexOf("/");
+        if (n != -1) {
+            f = filename.substring(n + 1);
+        }
+        n = f.lastIndexOf(".vm");
+        if (n != -1) {
+            f = f.substring(0, n);
+        }
+        this.filename = f;
     }
 
     public void writeArithmetic(String command) {
@@ -243,7 +253,7 @@ public class CodeWriter {
 
     // function functionName nVars
     public void writeFunction(String functionName, int nVars) {
-        writer.write(String.format("%s.%s)\n", this.filename, functionName));
+        writer.write(String.format("(%s.%s)\n", this.filename, functionName));
         for (int i = 0; i < nVars; i++) {
             writePushSegment("constant", 0);
         }

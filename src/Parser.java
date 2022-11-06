@@ -58,7 +58,13 @@ public class Parser {
                     "and", "or", "not" -> CommandType.C_ARITHMETIC;
             case "push" -> CommandType.C_PUSH;
             case "pop" -> CommandType.C_POP;
-            default -> throw new RuntimeException("CommandType()" + first);
+            case "label" -> CommandType.C_LABEL;
+            case "call" -> CommandType.C_CALL;
+            case "return" -> CommandType.C_RETURN;
+            case "if-goto" -> CommandType.C_IF;
+            case "function" -> CommandType.C_FUNCTION;
+            case "goto" -> CommandType.C_GOTO;
+            default -> throw new RuntimeException("CommandType(): " + currentCommand());
         };
     }
 

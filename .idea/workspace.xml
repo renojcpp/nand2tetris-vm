@@ -4,6 +4,7 @@
     <list default="true" id="500a57a1-c2d7-4e1e-b387-3385423dd2b7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CodeWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CodeWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/VMTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/VMTranslator.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -41,7 +42,7 @@
     <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="vm" />
-      <option name="PROGRAM_PARAMETERS" value="$USER_HOME$/school/cs3650/nand2tetris/projects/07/StackArithmetic/SimpleAdd/SimpleAdd.vm $USER_HOME$/school/cs3650/nand2tetris/projects/07/StackArithmetic/StackTest/StackTest.vm $USER_HOME$/school/cs3650/nand2tetris/projects/07/MemoryAccess/BasicTest/BasicTest.vm $USER_HOME$/school/cs3650/nand2tetris/projects/07/MemoryAccess/PointerTest/PointerTest.vm $USER_HOME$/school/cs3650/nand2tetris/projects/07/MemoryAccess/StaticTest/StaticTest.vm" />
+      <option name="PROGRAM_PARAMETERS" value="$USER_HOME$/school/cs3650/nand2tetris/projects/08/ProgramFlow/BasicLoop $USER_HOME$/school/cs3650/nand2tetris/projects/08/ProgramFlow/FibonacciSeries" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -73,9 +74,23 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/VMTranslator.java</url>
+          <line>36</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Parser.java</url>
-          <line>35</line>
-          <option name="timeStamp" value="1" />
+          <line>18</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/Parser.java</url>
+          <line>45</line>
+          <properties class="Parser" method="commandType">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

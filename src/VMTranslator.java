@@ -12,18 +12,23 @@ public class VMTranslator {
             if (f.isFile()) {
                 final int extIndex = arg.lastIndexOf(".");
                 final String outputName = arg.substring(0, extIndex) + ".asm";
-
-                translate(new CodeWriter(outputName), arg);
+                CodeWriter writer = new CodeWriter(outputName);
+                translate(writer, arg);
+                writer.close();
             } else if (f.isDirectory()) {
-                final int extIndex = arg.lastIndexOf("/");
-                final String outputName = extIndex == -1? arg + ".asm" : arg.substring(0, extIndex) + ".asm";
+                String outputName = arg;
+                if (!outputName.endsWith("/")) {
+                    outputName = outputName + "/";
+                }
+                outputName = outputName + "out.asm";
                 CodeWriter writer = new CodeWriter(outputName);
                 try (Stream<Path> stream = Files.list(Paths.get(arg))) {
-                    stream.filter(file -> !Files.isDirectory(file)).map(Path::toString)
+                    stream.filter(file -> !Files.isDirectory(file)).map(Path::toString).filter(file -> file.endsWith(".vm"))
                             .forEach(file -> translate(writer, file));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                writer.close();
             }
         }
     }
@@ -69,7 +74,5 @@ public class VMTranslator {
             }
             parser.advance();
         }
-
-        writer.close();
     }
 }

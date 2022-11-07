@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="500a57a1-c2d7-4e1e-b387-3385423dd2b7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CodeWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CodeWriter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/VMTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/VMTranslator.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,7 +73,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/VMTranslator.java</url>
-          <line>36</line>
+          <line>34</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

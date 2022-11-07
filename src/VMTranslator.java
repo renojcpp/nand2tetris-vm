@@ -17,12 +17,10 @@ public class VMTranslator {
                 writer.close();
             } else if (f.isDirectory()) {
                 String outputName = arg;
-                if (!outputName.endsWith("/")) {
-                    outputName = outputName + "/";
-                }
-                outputName = outputName + "out.asm";
+                Path p = Paths.get(arg);
+                outputName = outputName + "/" + p.getFileName().toString() + ".asm";
                 CodeWriter writer = new CodeWriter(outputName);
-                try (Stream<Path> stream = Files.list(Paths.get(arg))) {
+                try (Stream<Path> stream = Files.list(p)) {
                     stream.filter(file -> !Files.isDirectory(file)).map(Path::toString).filter(file -> file.endsWith(".vm"))
                             .forEach(file -> translate(writer, file));
                 } catch (IOException e) {
